@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a4d48">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; connect-src 'self' https://api.github.com https://gist.githubusercontent.com; form-action 'none'">
+<link rel="manifest" href="desktop.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lengo">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Lengo $30k · Desktop</title>
+<style>
+/* Lengo desktop — offline edition. Same data format and storage key as the phone file. */
+:root{color-scheme:light dark;--bg:light-dark(#eef4f3,#0b1413);--card:light-dark(#fff,#13211f);--ink:light-dark(#0f1d1c,#e8f2f0);--mute:light-dark(#5a6d6b,#97aba8);--line:light-dark(#dfe8e6,#23332f);--soft:light-dark(#e3f3f0,#163330);--brand:#0f766e;--deep:#0a4d48;--glow:#5eead4;--warn:#e2603f;--ok:#15935a;--hf:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3,.num{font-family:var(--hf);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--glow);outline-offset:2px;border-radius:8px}
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:linear-gradient(180deg,var(--deep),#0c5f58);color:#fff;padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
+.brand .av{width:42px;height:42px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font:800 16px var(--hf)}
+.brand small{display:block;opacity:.8;font-size:12.5px}.brand b{font:800 18px var(--hf)}
+.side button{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:#ffffffd0;font-weight:700;text-align:left;min-height:44px}
+.side button:hover{background:#ffffff14}.side button.on{background:#ffffff26;color:#fff}
+.side svg{width:20px;height:20px;flex:none}
+.side .new{background:#fff;color:var(--deep);margin:6px 0 10px;justify-content:center}
+.side .new:hover{background:#e8fffb}
+.side .foot{margin-top:auto;font-size:12.5px;opacity:.8;padding:0 8px}
+.side .foot b{display:inline-block;background:#ffffff22;border-radius:999px;padding:2px 10px;margin-bottom:6px;font-size:12px}
+main{padding:28px 32px 48px;max-width:1240px;width:100%}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.topbar h1{font-size:26px;font-weight:900;flex:1}
+.seg{display:flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg button{min-height:34px;padding:0 16px;border-radius:999px;font-weight:700;font-size:14px;color:var(--mute)}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff}
+.ib{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--card);color:var(--brand)}
+.ib svg{width:20px;height:20px}
+.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px}
+.card{background:var(--card);border-radius:20px;padding:20px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.ch h2{font-size:17px;font-weight:800}
+.bal{background:radial-gradient(120% 120% at 100% 0,#14958a33 0,transparent 55%),var(--card)}
+.balh{color:var(--mute);font-size:14px;font-weight:700}
+.big{font:900 52px/1.05 var(--hf);margin:8px 0 2px;letter-spacing:-.5px;white-space:nowrap}
+.alt{color:var(--mute);font-size:15px;font-weight:600}
+.meter{position:relative;height:16px;background:var(--soft);border-radius:999px;margin:18px 0 8px}
+.meter i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:linear-gradient(90deg,var(--brand),#22b3a3);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.meter u{position:absolute;top:-5px;bottom:-5px;width:3px;border-radius:2px;background:var(--ink);transform:translateX(-1px)}
+.mrow{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mute);font-weight:600}
+.status{margin-top:12px;font-weight:700;font-size:14px;padding:9px 12px;border-radius:12px}
+.status.ok{background:light-dark(#e3f6ec,#12301f);color:var(--ok)}.status.bad{background:light-dark(#fdeae4,#3a1d15);color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.stats div{text-align:center}.stats div+div{border-left:1px solid var(--line)}
+.stats b{display:block;font:800 20px var(--hf);white-space:nowrap}.stats span{font-size:12.5px;color:var(--mute);font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kv div{background:var(--soft);border-radius:14px;padding:12px 14px}
+.kv span{font-size:12.5px;color:var(--mute);font-weight:600;display:block}.kv b{font:800 20px var(--hf);white-space:nowrap}
+.miles{display:flex;justify-content:space-between;margin-top:16px;gap:4px}
+.mile{flex:1;text-align:center;font-size:12px;color:var(--mute);font-weight:700}
+.mile i{display:grid;place-items:center;width:32px;height:32px;margin:0 auto 4px;border-radius:50%;border:2px solid var(--line);font-style:normal;font-size:12px}
+.mile.on i{background:var(--brand);border-color:var(--brand);color:#fff}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.act{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:12px;padding:0 14px;min-height:42px;font-weight:700;color:var(--ink)}
+.act svg{width:18px;height:18px;color:var(--brand)}.act:hover{background:var(--soft)}
+.src{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px;font-weight:600;margin:10px 0}
+.src .b{height:10px;background:var(--soft);border-radius:999px;overflow:hidden}.src .b i{display:block;height:100%;background:var(--brand);border-radius:999px}
+.src b{font-weight:800;white-space:nowrap}
+.rate{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.rate .old{color:var(--warn)}
+.link{color:var(--brand);font-weight:700;font-size:14px;min-height:36px;padding:0 6px}
+.hint{font-size:13px;color:var(--mute);margin-top:8px}
+.banner{margin:0 0 18px;padding:10px 14px;border-radius:12px;background:light-dark(#fff4d8,#3a2f12);font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.banner:empty{display:none}.banner button{color:var(--brand);font-weight:800;min-height:36px}
+.filters{display:flex;gap:8px;align-items:center}
+.filters input,.filters select{min-height:38px;width:auto;border-radius:10px;font-size:14px;padding:0 10px}
+.filters input{width:200px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mute);font-size:12.5px;font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 10px;white-space:nowrap;border-bottom:1px solid var(--line);vertical-align:middle}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.g{color:var(--ok);font-weight:800}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--soft)}
+td .tag{display:inline-block;background:var(--soft);color:var(--brand);border-radius:8px;padding:2px 8px;font-weight:700;font-size:12.5px}
+td small{white-space:normal;display:block;color:var(--mute);font-size:12.5px}
+tfoot td{font-weight:800;border-bottom:0}
+.empty{color:var(--mute);text-align:center;padding:24px 8px}
+.scrim{position:fixed;inset:0;background:#0008;z-index:10;display:none}
+.scrim.open{display:block}
+.sheet{position:fixed;left:50%;top:50%;width:min(520px,92vw);max-height:88vh;overflow:auto;background:var(--card);border-radius:22px;padding:22px 24px 24px;z-index:11;transform:translate(-50%,-46%);opacity:0;pointer-events:none;transition:.2s ease;box-shadow:0 30px 80px #0006}
+.sheet.open{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+.grab{display:none}
+.sheet h3{font-size:21px;font-weight:800;margin-bottom:12px}
+label{display:block;font-size:13.5px;font-weight:700;color:var(--mute);margin:12px 0 5px}
+input,select,textarea{width:100%;min-height:44px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;background:var(--bg);font-size:15px}
+textarea{padding:10px 12px;min-height:120px;font-size:13px;font-family:ui-monospace,monospace}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);outline:none}
+.two{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:36px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);font-weight:700;font-size:14px}
+.chips button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.err{color:var(--warn);font-weight:700;font-size:14px;min-height:20px;margin-top:8px}
+.go{width:100%;min-height:48px;border-radius:14px;background:var(--brand);color:#fff;font:800 16px var(--hf);margin-top:12px}
+.go2{width:100%;min-height:46px;border-radius:14px;background:var(--soft);color:var(--brand);font-weight:800;margin-top:10px}
+.del{width:100%;min-height:44px;border-radius:14px;color:var(--warn);font-weight:800;margin-top:6px}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0;border-top:1px solid var(--line);min-height:54px;font-weight:700}
+.row:first-of-type{border-top:0}.row small{display:block;color:var(--mute);font-weight:600;font-size:13px}.row .m{flex:1}
+.row::after{content:"›";color:var(--mute);font-size:22px}
+.pb{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:16px;padding:12px 14px;margin-top:10px}
+.pb span{font-size:13px;color:var(--mute);font-weight:700;display:block}.pb b{font:900 24px var(--hf);letter-spacing:1px;white-space:nowrap}
+.pb button{min-height:40px;padding:0 16px;border-radius:12px;background:var(--brand);color:#fff;font-weight:800;flex:none}
+.steps{margin:14px 0 0;padding-left:20px;font-size:15px}.steps li{margin:4px 0}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;z-index:20;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+kbd{font:700 11px ui-monospace,monospace;background:#ffffff26;border-radius:5px;padding:1px 5px;margin-left:auto}
+.side .new kbd{background:var(--soft);color:var(--deep)}
+@media(max-width:900px){.shell{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap}.side .foot,.brand{display:none}.grid{grid-template-columns:1fr}main{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Main">
+    <div class="brand"><div class="av" aria-hidden="true">JA</div><div><small id="greet">Habari</small><b>Juma</b></div></div>
+    <button class="new" data-act="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add deposit<kbd>N</kbd></button>
+    <button class="on" data-go="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</button>
+    <button data-go="activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>Statement</button>
+    <button data-act="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></svg>Send to I&amp;M</button>
+    <button data-act="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</button>
+    <div class="foot"><button id="syncPill" data-act="sync" style="display:inline-block;background:#ffffff22;border-radius:999px;padding:2px 10px;margin-bottom:6px;font-size:12px;min-height:0;color:#fff">Offline</button><br><span id="syncNote">Nothing leaves this computer. No account, no internet.</span></div>
+  </aside>
+  <main id="top">
+    <div class="topbar">
+      <h1>Lengo $30k</h1>
+      <div class="seg" role="group" aria-label="Currency"><button id="cUSD" aria-pressed="true">USD</button><button id="cKES" aria-pressed="false">KES</button></div>
+      <button class="ib" id="eye" aria-label="Hide balance" title="Hide balance (H)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <div class="banner" id="banner"></div>
+    <div class="grid">
+      <section class="card bal" aria-label="Goal balance">
+        <div class="balh">Earned towards goal</div>
+        <div class="big num" id="big">$0.00</div>
+        <div class="alt" id="alt">KSh 0</div>
+        <div class="meter" aria-hidden="true"><i id="fill" style="width:0"></i><u id="mark" title="Where you should be today"></u></div>
+        <div class="mrow"><span id="pct">0% of $30,000</span><span>▏= today's pace</span></div>
+        <div class="status" id="status"></div>
+        <div class="stats">
+          <div><b id="sDays">0</b><span>days left</span></div>
+          <div><b id="sNeed">$0</b><span>needed / week</span></div>
+          <div><b id="sDead">Dec 2027</b><span>deadline</span></div>
+        </div>
+      </section>
+      <section class="card" id="pace" aria-labelledby="h-pace">
+        <div class="ch"><h2 id="h-pace">Pace</h2></div>
+        <div class="kv">
+          <div><span>Your pace / week</span><b id="pNow">$0</b></div>
+          <div><span>Needed / week</span><b id="pNeed">$0</b></div>
+          <div><span>Needed / month</span><b id="pMonth">$0</b></div>
+          <div><span>Projected finish</span><b id="pProj">—</b></div>
+        </div>
+        <div class="miles" id="miles"></div>
+      </section>
+    </div>
+    <div class="actions">
+      <button class="act" data-act="rate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>Update rate</button>
+      <button class="act" data-act="goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>Goal &amp; deadline</button>
+      <button class="act" data-act="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>Copy statement</button>
+      <button class="act" data-act="backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Back up</button>
+    </div>
+    <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <section class="card" aria-labelledby="h-src">
+          <div class="ch"><h2 id="h-src">Where it comes from</h2></div>
+          <div id="srcs"></div>
+        </section>
+        <section class="card" aria-labelledby="h-rate">
+          <div class="rate"><div><h2 id="h-rate" style="font-size:16px">Exchange rate</h2><span id="rateTxt"></span></div><button class="link" data-act="rate">Update</button></div>
+          <p class="hint">Each deposit keeps the rate from the day you logged it. The live balance uses the rate above.</p>
+        </section>
+    </div>
+      <section class="card" style="margin-top:18px" id="activity" aria-labelledby="h-act">
+        <div class="ch"><h2 id="h-act">Statement</h2>
+          <div class="filters"><input id="q" type="search" placeholder="Search client or note" aria-label="Search statement"><select id="fs" aria-label="Filter by source"><option value="">All sources</option></select></div></div>
+        <div id="list"></div>
+      </section>
+  </main>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle"><div class="grab"></div><div id="shBody"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+{
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const DEF={target:30000,deadline:'2027-12-31',start:'2026-11-25',rate:129,rateDate:'2026-11-25',imAcct:'',lastBackup:''};
+const SOURCES=['PayPal','Payoneer','Upwork','Bank','M-Pesa','Other'];
+const LK='lengo-offline-v1';
+let S={...DEF},deps=[],cur='USD',hidden=false,canSave=true,Sup=0,tomb=[];
+const SK='lengo-sync-v1';let cfg={};try{cfg=JSON.parse(localStorage.getItem(SK)||'{}')}catch(e){}
+
+/* ---------- storage: this device only ---------- */
+function load(){try{const j=JSON.parse(localStorage.getItem(LK)||'{}');S={...DEF,...(j.S||{})};deps=Array.isArray(j.deps)?j.deps:[];cur=j.cur||'USD';hidden=!!j.hidden;Sup=j.Sup||0;tomb=Array.isArray(j.tomb)?j.tomb:[]}catch(e){canSave=false}}
+function store(){try{localStorage.setItem(LK,JSON.stringify({S,deps,cur,hidden,Sup,tomb}))}catch(e){canSave=false;toast('This browser is not saving. Back up now.')}}
+function save(){store();queueSync()}
+try{localStorage.setItem('lengo-test','1');localStorage.removeItem('lengo-test')}catch(e){canSave=false}
+load();
+
+const usd=(n,d=2)=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const kes=n=>'KSh '+Math.round(+n||0).toLocaleString('en-US');
+const fd=(s,o={day:'numeric',month:'short',year:'numeric'})=>{const d=new Date(s+'T12:00');return isNaN(d)?'—':d.toLocaleDateString('en-GB',o)};
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2600)};
+const h=new Date().getHours();$('greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', habari';
+
+function calc(){
+  const total=deps.reduce((a,d)=>a+(+d.netUsd||0),0),t=+S.target||30000;
+  const start=new Date(S.start+'T00:00'),end=new Date(S.deadline+'T23:59:59'),now=new Date();
+  const span=Math.max(864e5,end-start),el=Math.min(span,Math.max(0,now-start));
+  const expected=t*el/span,daysLeft=Math.max(0,Math.ceil((end-now)/864e5));
+  const remaining=Math.max(0,t-total),needWeek=remaining/Math.max(daysLeft/7,1/7);
+  const pace=total/Math.max(1,el/6048e5);
+  const proj=remaining<=0?now:pace>0?new Date(now.getTime()+remaining/pace*6048e5):null;
+  return{total,t,expected,daysLeft,remaining,needWeek,pace,proj,end,pct:Math.min(100,total/t*100),expPct:Math.min(100,expected/t*100)};
+}
+function bannerRender(){
+  const b=$('banner');
+  if(!canSave){b.innerHTML='<span>This browser is blocking storage, so entries may be lost when you close it. Open the file in Chrome or Firefox.</span>';return}
+  if(cfg.gistId||!deps.length){b.innerHTML='';return}
+  const age=S.lastBackup?Math.floor((new Date(today())-new Date(S.lastBackup))/864e5):null;
+  if(age===null||age>=7)b.innerHTML=`<span>${age===null?'No backup yet.':'Last backup '+age+' days ago.'} Your data lives only on this device.</span><button data-act="backup">Back up</button>`;
+  else b.innerHTML='';
+}
+function render(){
+  const c=calc(),mask='••••••';
+  $('cUSD').setAttribute('aria-pressed',cur==='USD');$('cKES').setAttribute('aria-pressed',cur==='KES');
+  $('big').textContent=hidden?mask:cur==='USD'?usd(c.total):kes(c.total*S.rate);
+  $('alt').textContent=hidden?'Balance hidden':cur==='USD'?'≈ '+kes(c.total*S.rate):'≈ '+usd(c.total);
+  $('eye').setAttribute('aria-label',hidden?'Show balance':'Hide balance');
+  $('fill').style.width=c.pct+'%';$('mark').style.left=c.expPct+'%';
+  $('pct').textContent=c.pct.toFixed(1)+'% of '+usd(c.t,0);
+  const diff=c.total-c.expected,st=$('status');
+  if(c.remaining<=0){st.className='status ok';st.textContent='Goal reached. Well done.'}
+  else if(diff>=0){st.className='status ok';st.textContent='Ahead of pace by '+usd(diff,0)}
+  else{st.className='status bad';st.textContent='Behind pace by '+usd(-diff,0)+'. Today you should be at '+usd(c.expected,0)}
+  $('sDays').textContent=c.daysLeft.toLocaleString('en-US');
+  $('sNeed').textContent=usd(c.needWeek,0);
+  $('sDead').textContent=fd(S.deadline,{month:'short',year:'numeric'});
+  $('pNow').textContent=usd(c.pace,0);$('pNeed').textContent=usd(c.needWeek,0);
+  $('pMonth').textContent=usd(c.needWeek*52/12,0);
+  const pp=$('pProj');
+  if(!c.proj){pp.textContent='Add a deposit';pp.style.color=''}
+  else{pp.textContent=c.proj.toLocaleDateString('en-GB',{month:'short',year:'numeric'});pp.style.color=c.proj>c.end?'var(--warn)':'var(--ok)'}
+  $('miles').innerHTML=[25,50,75,100].map(m=>`<div class="mile${c.pct>=m?' on':''}"><i>${c.pct>=m?'✓':m+'%'}</i>${usd(c.t*m/100,0)}</div>`).join('');
+  const by={};deps.forEach(d=>{const k=d.source||'Other';by[k]=(by[k]||0)+(+d.netUsd||0)});
+  const rows=Object.entries(by).sort((a,b)=>b[1]-a[1]),mx=rows.length?rows[0][1]:1;
+  $('srcs').innerHTML=rows.length?rows.map(([k,v])=>`<div class="src"><span>${esc(k)}</span><div class="b"><i style="width:${Math.max(2,v/mx*100)}%"></i></div><b>${hidden?'••••':usd(v,0)}</b></div>`).join(''):'<p class="empty">Sources show up after your first deposit.</p>';
+  const fsel=$('fs'),fv=fsel.value,qv=($('q').value||'').trim().toLowerCase();
+  fsel.innerHTML='<option value="">All sources</option>'+SOURCES.map(s=>`<option${s===fv?' selected':''}>${s}</option>`).join('');
+  const list=[...deps].filter(d=>(!fv||(d.source||'Other')===fv)&&(!qv||((d.from||'')+' '+(d.note||'')).toLowerCase().includes(qv))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0));
+  const sumU=list.reduce((a,d)=>a+(+d.netUsd||0),0),sumK=list.reduce((a,d)=>a+(+d.netUsd||0)*(+d.rateUsed||S.rate),0);
+  $('list').innerHTML=list.length?`<table><thead><tr><th>Date</th><th>Client / project</th><th>Source</th><th class="n">Received</th><th class="n">Fee</th><th class="n">Net USD</th><th class="n">Net KES</th></tr></thead><tbody>`+list.map(d=>{
+    const k=(+d.netUsd||0)*(+d.rateUsed||S.rate),m=v=>d.currency==='KES'?kes(v):usd(v);
+    return `<tr class="tx" data-id="${esc(d.id)}" tabindex="0"><td>${esc(fd(d.date))}</td><td style="white-space:normal">${esc(d.from||'—')}${d.note?`<small>${esc(d.note)}</small>`:''}</td><td><span class="tag">${esc(d.source||'Other')}</span></td><td class="n">${hidden?'••••':esc(m(d.amount))}</td><td class="n">${+d.fee?(hidden?'••':esc(m(d.fee))):'—'}</td><td class="n g">${hidden?'••••':'+'+usd(d.netUsd)}</td><td class="n">${hidden?'••••':kes(k)}</td></tr>`}).join('')+`</tbody><tfoot><tr><td colspan="5">${list.length} deposit${list.length===1?'':'s'}${fv||qv?' (filtered)':''}</td><td class="n">${hidden?'••••':usd(sumU)}</td><td class="n">${hidden?'••••':kes(sumK)}</td></tr></tfoot></table>`
+    :deps.length?'<p class="empty">No deposits match.</p>':'<p class="empty">No deposits yet. Press <b>N</b> or click <b>Add deposit</b>, or bring in a backup from Settings.</p>';
+  const age=Math.floor((new Date(today())-new Date(S.rateDate))/864e5);
+  $('rateTxt').innerHTML=`1 USD = ${esc((+S.rate).toFixed(2))} KES · set ${esc(fd(S.rateDate))}${age>7?` <span class="old">· ${age} days old</span>`:''}`;
+  bannerRender();
+}
+function setS(next,localOnly){S={...S,...next};if(!localOnly)Sup=Date.now();save();render()}
+function saveDep(id,rec){rec={...rec,updated:Date.now()};if(id)deps=deps.map(d=>d.id===id?{...rec,id}:d);else deps.push({...rec,id:'d'+Date.now()+Math.random().toString(36).slice(2,6)});save();render()}
+function delDep(id){deps=deps.filter(d=>d.id!==id);tomb.push({id,updated:Date.now()});save();render()}
+
+/* ---------- sheets ---------- */
+const sheet=$('sheet'),scrim=$('scrim');
+function open(html,bind){$('shBody').innerHTML=html;sheet.classList.add('open');scrim.classList.add('open');bind&&bind();setTimeout(()=>{const f=sheet.querySelector('input:not([type=file])');f&&f.focus()},250)}
+function close(){sheet.classList.remove('open');scrim.classList.remove('open')}
+scrim.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+function depSheet(d){
+  const r=d||{date:today(),currency:'USD',source:'PayPal',fee:''};
+  open(`<h3 id="shTitle">${d?'Edit deposit':'Add deposit'}</h3><form id="f" novalidate>
+    <label for="fAmt">Amount received</label><div class="two"><input id="fAmt" inputmode="decimal" type="number" step="0.01" min="0" value="${esc(r.amount??'')}" placeholder="0.00"><select id="fCur" aria-label="Currency"><option${r.currency==='USD'?' selected':''}>USD</option><option${r.currency==='KES'?' selected':''}>KES</option></select></div>
+    <label for="fFee">Fees taken (same currency)</label><input id="fFee" inputmode="decimal" type="number" step="0.01" min="0" value="${esc(r.fee??'')}" placeholder="0.00">
+    <label>Received through</label><div class="chips" id="fSrc">${SOURCES.map(s=>`<button type="button" aria-pressed="${s===r.source}">${esc(s)}</button>`).join('')}</div>
+    <label for="fFrom">Client or project</label><input id="fFrom" value="${esc(r.from??'')}" placeholder="e.g. Systematic review, US client" maxlength="80">
+    <label for="fDate">Date received</label><input id="fDate" type="date" value="${esc(r.date)}">
+    <label for="fNote">Note (optional)</label><input id="fNote" value="${esc(r.note??'')}" maxlength="120">
+    <p class="hint" id="fNet"></p><div class="err" id="fErr"></div>
+    <button class="go" type="submit">${d?'Save changes':'Add to goal'}</button>${d?'<button type="button" class="del" id="fDel">Delete deposit</button>':''}</form>`,()=>{
+    let src=r.source;
+    const rateFor=c=>d&&d.currency===c&&d.rateUsed?+d.rateUsed:+S.rate;
+    const net=()=>{const a=+$('fAmt').value||0,f=+$('fFee').value||0,c=$('fCur').value,rt=rateFor(c),n=c==='USD'?a-f:(a-f)/rt;$('fNet').textContent=a?`Counts as ${usd(n)} net (${kes(n*rt)} at ${rt.toFixed(2)}).`:''};
+    ['fAmt','fFee','fCur'].forEach(i=>$(i).addEventListener('input',net));net();
+    $('fSrc').onclick=e=>{const b=e.target.closest('button');if(!b)return;src=b.textContent;[...$('fSrc').children].forEach(x=>x.setAttribute('aria-pressed',x===b))};
+    $('f').onsubmit=e=>{e.preventDefault();
+      const a=+$('fAmt').value,f=+$('fFee').value||0,c=$('fCur').value,dt=$('fDate').value;
+      if(!(a>0))return $('fErr').textContent='Enter the amount you received.';
+      if(f<0||f>=a)return $('fErr').textContent='Fees must be less than the amount.';
+      if(!dt)return $('fErr').textContent='Pick the date you received it.';
+      const rate=rateFor(c),n=c==='USD'?a-f:(a-f)/rate;
+      close();saveDep(d&&d.id,{date:dt,amount:a,fee:f,currency:c,rateUsed:rate,netUsd:Math.round(n*100)/100,source:src,from:$('fFrom').value.trim(),note:$('fNote').value.trim(),created:d&&d.created||Date.now()});
+      toast(d?'Deposit updated':'Added '+usd(n)+' to your goal')};
+    const del=$('fDel');if(del)del.onclick=()=>{if(del.dataset.sure){close();delDep(d.id);toast('Deposit deleted')}else{del.dataset.sure=1;del.textContent='Tap again to delete'}};
+  })}
+function rateSheet(){
+  open(`<h3 id="shTitle">Update exchange rate</h3><form id="f" novalidate><label for="fRate">KES for 1 USD</label><input id="fRate" type="number" inputmode="decimal" step="0.01" min="1" value="${esc(S.rate)}">
+    <p class="hint">Check the rate your bank, PayPal or Payoneer gives you, or a mid-market rate. Past deposits keep their own rate.</p><div class="err" id="fErr"></div><button class="go">Save rate</button></form>`,()=>{
+    $('f').onsubmit=e=>{e.preventDefault();const v=+$('fRate').value;if(!(v>1))return $('fErr').textContent='Enter a rate above 1.';close();setS({rate:v,rateDate:today()});toast('Rate updated')}})}
+function goalSheet(){
+  open(`<h3 id="shTitle">Goal &amp; deadline</h3><form id="f" novalidate><label for="fT">Target (USD)</label><input id="fT" type="number" inputmode="decimal" min="1" value="${esc(S.target)}">
+    <label for="fD">Deadline</label><input id="fD" type="date" value="${esc(S.deadline)}"><label for="fS">Counting from</label><input id="fS" type="date" value="${esc(S.start)}">
+    <div class="err" id="fErr"></div><button class="go">Save goal</button></form>`,()=>{
+    $('f').onsubmit=e=>{e.preventDefault();const t=+$('fT').value,dl=$('fD').value,st=$('fS').value;
+      if(!(t>0))return $('fErr').textContent='Enter a target above 0.';if(!dl||!st||st>=dl)return $('fErr').textContent='The deadline must come after the start date.';
+      close();setS({target:t,deadline:dl,start:st});toast('Goal saved')}})}
+const copy=async(v,what)=>{try{await navigator.clipboard.writeText(v);toast(what+' copied');return true}catch(e){
+  try{const t=document.createElement('textarea');t.value=v;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();if(ok){toast(what+' copied');return true}}catch(_){}
+  toast('Copy was blocked on this device');return false}};
+function acctForm(){
+  open(`<h3 id="shTitle">Your I&amp;M account</h3><form id="f" novalidate><label for="fAc">I&amp;M account number (14 digits)</label><input id="fAc" inputmode="numeric" autocomplete="off" maxlength="20" value="${esc(S.imAcct||'')}" placeholder="14 digits, no spaces">
+    <p class="hint">Stored only in this browser on this computer. M-Pesa needs the full 14 digits, or the deposit can fail.</p><div class="err" id="fErr"></div><button class="go">Save account</button></form>`,()=>{
+    $('f').onsubmit=e=>{e.preventDefault();const v=$('fAc').value.replace(/[\s-]/g,'');
+      if(!/^\d{14}$/.test(v))return $('fErr').textContent='Enter exactly 14 digits ('+v.replace(/\D/g,'').length+' entered).';
+      setS({imAcct:v});toast('Account saved');sendSheet()}})}
+function sendSheet(){
+  const ac=S.imAcct||'';
+  if(!ac)return acctForm();
+  const shown=hidden?'•••• •••• '+ac.slice(-4):ac.replace(/(\d{4})(?=\d)/g,'$1 ');
+  open(`<h3 id="shTitle">Send M-Pesa to I&amp;M</h3>
+    <div class="pb"><div><span>Pay Bill number</span><b>542 542</b></div><button type="button" id="cpPb">Copy</button></div>
+    <div class="pb"><div><span>Account number</span><b style="font-size:19px">${esc(shown)}</b></div><button type="button" id="cpAc">Copy</button></div>
+    <ol class="steps"><li>Open M-Pesa, or dial <b>*334#</b></li><li>Lipa na M-Pesa, then <b>Pay Bill</b></li><li>Business number <b>542542</b></li><li>Account: your <b>14-digit</b> I&amp;M number</li><li>Enter the amount and your M-Pesa PIN</li></ol>
+    <p class="hint">Prefer a PIN prompt? I&amp;M's Mpesa Xpress sends one to your phone from their website (imbankgroup.com). Transfers to I&amp;M don't count toward the goal.</p>
+    <button type="button" class="del" id="chAc" style="color:var(--mute)">Change account number</button>`,()=>{
+    $('cpPb').onclick=()=>copy('542542','Pay Bill');$('cpAc').onclick=()=>copy(ac,'Account number');$('chAc').onclick=acctForm})}
+function csvOf(){
+  const rows=[['Date','Source','Client/project','Amount','Currency','Fee','Net USD','Rate used','Net KES','Note']].concat([...deps].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(d=>[d.date,d.source,d.from,d.amount,d.currency,d.fee,d.netUsd,d.rateUsed,Math.round((+d.netUsd||0)*(+d.rateUsed||0)),d.note]));
+  return rows.map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\n');
+}
+async function copyStatement(){if(await copy(csvOf(),'Statement'))toast('Statement copied. Paste it into a sheet.')}
+
+/* ---------- backup / restore / import ---------- */
+function backupText(){return JSON.stringify({app:'lengo',v:1,saved:new Date().toISOString(),S,deps},null,1)}
+function backupSheet(){
+  open(`<h3 id="shTitle">Back up</h3>
+    <p class="hint" style="margin-top:0">Your data is only in this browser on this device. If you clear the browser or change computers, a backup file is the only copy. The same file restores on your phone. Keep it somewhere private, for example a USB stick or a folder only you use.</p>
+    <button class="go" id="bDl">Save backup file</button>
+    <button class="go2" id="bCp">Copy backup as text</button>
+    <p class="hint" id="bMsg"></p>`,()=>{
+    $('bDl').onclick=()=>{try{const blob=new Blob([backupText()],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='lengo-backup-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);setS({lastBackup:today()},1);$('bMsg').textContent='Saved to your Downloads as lengo-backup-'+today()+'.json.'}catch(e){$('bMsg').textContent='This browser blocked the download. Use "Copy backup as text" and paste it into a private note.'}};
+    $('bCp').onclick=async()=>{if(await copy(backupText(),'Backup'))setS({lastBackup:today()},1)};
+  })}
+function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f=''}else f+=c}if(f||row.length){row.push(f);out.push(row)}return out.filter(r=>r.some(x=>x.trim()))}
+function fromCSV(t){
+  const rows=parseCSV(t.trim());if(rows.length<2)throw 0;
+  const hd=rows[0].map(x=>x.trim().toLowerCase()),ix=n=>hd.indexOf(n.toLowerCase());
+  if(ix('Date')<0||ix('Net USD')<0)throw 0;
+  return rows.slice(1).map((r,i)=>{const g=n=>{const k=ix(n);return k<0?'':(r[k]||'').trim()};
+    return{id:'i'+Date.now()+'_'+i,date:g('Date'),source:SOURCES.includes(g('Source'))?g('Source'):'Other',from:g('Client/project'),amount:+g('Amount')||+g('Net USD'),currency:g('Currency')==='KES'?'KES':'USD',fee:+g('Fee')||0,netUsd:+g('Net USD')||0,rateUsed:+g('Rate used')||+S.rate,note:g('Note'),created:Date.now()+i,updated:Date.now()}}).filter(d=>d.date&&d.netUsd>0);
+}
+const key=d=>[d.date,d.source,d.from,(+d.netUsd).toFixed(2)].join('|');
+function restoreSheet(){
+  open(`<h3 id="shTitle">Restore or import</h3>
+    <label for="rFile">Backup file (.json) or statement (.csv)</label><input id="rFile" type="file" accept=".json,.csv,application/json,text/csv,text/plain" style="padding:10px 14px">
+    <label for="rTxt">…or paste it here</label><textarea id="rTxt" placeholder="Paste a backup, or the statement you copied from the old Lengo"></textarea>
+    <p class="hint">A backup file <b>replaces</b> everything in the app. A statement (CSV) <b>adds</b> its deposits and skips ones already here.</p>
+    <div class="err" id="rErr"></div><button class="go" id="rGo">Bring it in</button>`,()=>{
+    $('rFile').onchange=()=>{const f=$('rFile').files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{$('rTxt').value=rd.result};rd.readAsText(f)};
+    $('rGo').onclick=()=>{
+      const t=$('rTxt').value.trim(),btn=$('rGo');if(!t)return $('rErr').textContent='Pick a file or paste something first.';
+      let j=null;try{j=JSON.parse(t)}catch(e){}
+      if(j&&j.app==='lengo'&&Array.isArray(j.deps)){
+        if(deps.length&&!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='Tap again to replace '+deps.length+' deposits';return}
+        const now=Date.now(),nid=new Set(j.deps.map(d=>d.id));deps.forEach(d=>{if(!nid.has(d.id))tomb.push({id:d.id,updated:now})});tomb=tomb.filter(t=>!nid.has(t.id));S={...DEF,...(j.S||{})};Sup=now;deps=j.deps.map(d=>({...d,updated:now}));save();render();close();return toast('Restored '+deps.length+' deposits')}
+      try{const inc=fromCSV(t),have=new Set(deps.map(key)),add=inc.filter(d=>!have.has(key(d)));deps=deps.concat(add);save();render();close();toast('Added '+add.length+' deposit'+(add.length===1?'':'s')+(inc.length>add.length?', skipped '+(inc.length-add.length)+' already here':''))}
+      catch(e){$('rErr').textContent="That doesn't look like a Lengo backup or statement."}
+    }})}
+function wipeSheet(){
+  open(`<h3 id="shTitle">Erase everything</h3><p class="hint" style="margin-top:0">This removes all deposits, your goal settings and your I&amp;M number from this device. If sync is on, it's erased on your other devices too. It can't be undone. Back up first if you might want them again.</p>
+    <button class="del" id="wGo" style="background:light-dark(#fdeae4,#3a1d15)">Erase all data on this device</button>`,()=>{
+    const b=$('wGo');b.onclick=()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Tap again to erase';return}
+      const now=Date.now();deps.forEach(d=>tomb.push({id:d.id,updated:now}));S={...DEF};Sup=now;deps=[];save();render();close();toast('Everything erased')}})}
+function settingsSheet(){
+  const age=S.lastBackup?fd(S.lastBackup):'never';
+  open(`<h3 id="shTitle">Settings</h3>
+    <button class="row" data-s="goal"><span class="m">Goal &amp; deadline<small>${esc(usd(S.target,0))} by ${esc(fd(S.deadline))}</small></span></button>
+    <button class="row" data-s="acct"><span class="m">I&amp;M account number<small>${S.imAcct?'Ends '+esc(S.imAcct.slice(-4)):'Not set'}</small></span></button>
+    <button class="row" data-s="sync"><span class="m">Sync between devices<small>${cfg.gistId?'On · encrypted':'Off'}</small></span></button>
+    <button class="row" data-s="backup"><span class="m">Back up<small>Last backup: ${esc(age)}</small></span></button>
+    <button class="row" data-s="restore"><span class="m">Restore or import<small>From a backup file or your old statement</small></span></button>
+    <button class="row" data-s="wipe"><span class="m" style="color:var(--warn)">Erase everything<small>Remove all Lengo data from this device</small></span></button>
+    <p class="hint">${cfg.gistId?'Sync is on. Only encrypted data goes online, to a private gist in your GitHub account.':'Lengo runs fully offline. It makes no internet connections, has no account, and nothing you enter leaves this computer.'}</p>`,()=>{
+    $('shBody').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;({sync:syncSheet,goal:goalSheet,acct:acctForm,backup:backupSheet,restore:restoreSheet,wipe:wipeSheet})[b.dataset.s]()}})}
+
+/* ---------- encrypted sync (private GitHub gist; AES-GCM, ckey from your passphrase) ---------- */
+const GH='https://api.github.com',FN='lengo.sync.json';
+let ckey=null,syncing=false,again=false,syncT=null,lastSync=0,syncErr='';
+const b64=u=>{u=new Uint8Array(u);let s='';for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)};
+const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function derive(pass,salt){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:ub64(salt),iterations:310000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},true,['encrypt','decrypt'])}
+async function enc(obj,salt=cfg.salt){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},ckey,new TextEncoder().encode(JSON.stringify(obj)));return JSON.stringify({app:'lengo-sync',v:1,salt,iv:b64(iv),ct:b64(ct)})}
+async function dec(env,k=ckey){const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(env.iv)},k,ub64(env.ct));return JSON.parse(new TextDecoder().decode(pt))}
+async function gh(path,opt={},tok=cfg.token){
+  const r=await fetch(GH+path,{...opt,cache:'no-store',headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json',...(opt.body?{'Content-Type':'application/json'}:{})}});
+  if(!r.ok)throw Object.assign(new Error('gh'),{status:r.status});return r.json()}
+async function readGist(id,tok){const g=await gh('/gists/'+id,{},tok),f=g.files&&g.files[FN];if(!f)throw Object.assign(new Error('nofile'),{status:404});
+  let c=f.content;if(f.truncated)c=await (await fetch(f.raw_url,{cache:'no-store'})).text();return JSON.parse(c)}
+const payload=()=>({S,Sup,deps,tomb});
+const byId=(a,b)=>String(a.id).localeCompare(String(b.id));
+const canon=p=>JSON.stringify([p.Sup||0,p.S||{},[...(p.deps||[])].sort(byId),[...(p.tomb||[])].sort(byId)]);
+function merge(r){
+  if(!r)return;
+  if((r.Sup||0)>Sup){S={...DEF,...(r.S||{})};Sup=r.Sup}
+  const m=new Map(),put=(id,u,rec)=>{const c=m.get(id);if(!c||u>c.u)m.set(id,{u,rec})};
+  deps.forEach(d=>put(d.id,d.updated||d.created||0,d));tomb.forEach(t=>put(t.id,t.updated||0,null));
+  (r.deps||[]).forEach(d=>put(d.id,d.updated||d.created||0,d));(r.tomb||[]).forEach(t=>put(t.id,t.updated||0,null));
+  deps=[];tomb=[];m.forEach((v,id)=>v.rec?deps.push(v.rec):tomb.push({id,updated:v.u}));
+}
+const hhmm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+function syncStatus(){
+  const p=$('syncPill'),n=$('syncNote'),set=(a,b)=>{if(p)p.textContent=a;if(n)n.textContent=b};
+  if(!cfg.gistId)return set('Offline','Nothing leaves this computer. No account, no internet.');
+  if(!ckey)return set('Sync locked','Reconnect in Settings → Sync.');
+  if(syncErr)return set('Sync error',syncErr);
+  set(syncing?'Syncing…':lastSync?'Synced '+hhmm(lastSync):'Sync on','Encrypted on this device before upload. Only your passphrase opens it.');
+}
+function queueSync(){if(!cfg.gistId||!ckey)return;clearTimeout(syncT);syncT=setTimeout(sync,1200)}
+async function sync(){
+  if(!cfg.gistId||!ckey)return;if(syncing){again=true;return}
+  syncing=true;syncErr='';syncStatus();
+  try{
+    const env=await readGist(cfg.gistId);let remote;
+    try{remote=await dec(env)}catch(e){throw Object.assign(new Error('ckey'),{status:'ckey'})}
+    merge(remote);store();render();
+    if(canon(payload())!==canon(remote))await gh('/gists/'+cfg.gistId,{method:'PATCH',body:JSON.stringify({files:{[FN]:{content:await enc(payload())}}})});
+    lastSync=Date.now();
+  }catch(e){syncErr=e.status==='ckey'?"Passphrase doesn't match the online copy.":e.status===401?'GitHub rejected the access token. Update it in Settings → Sync.':e.status===403?'The token lacks gist access, or GitHub is rate-limiting. Try again later.':e.status===404?'Online copy not found. Reconnect in Settings → Sync.':"Couldn't reach GitHub. Will retry."}
+  syncing=false;syncStatus();const t=$('ssTxt');if(t)t.textContent=syncLine();
+  if(again){again=false;sync()}
+}
+const syncLine=()=>syncErr||(syncing?'Syncing…':lastSync?'Synced at '+hhmm(lastSync):'Waiting to sync');
+function syncSheet(){
+  if(!cfg.gistId||!ckey)return connectSheet();
+  open(`<h3 id="shTitle">Sync between devices</h3>
+    <p class="hint" style="margin-top:0">On. Your data is encrypted on this device with your passphrase, then saved to a private gist in your GitHub account. GitHub, Claude and anyone else only ever see scrambled text.</p>
+    <div class="pb"><div><span>Status</span><b style="font-size:17px;letter-spacing:0" id="ssTxt">${esc(syncLine())}</b></div><button type="button" id="ssNow">Sync now</button></div>
+    <p class="hint">Changes sync a moment after you make them, when you open the app, and every 2 minutes while it's open.</p>
+    <button type="button" class="go2" id="ssTok">Update access token</button>
+    <button type="button" class="del" id="ssOff">Turn off sync on this device</button>`,()=>{
+    $('ssNow').onclick=()=>sync();$('ssTok').onclick=()=>connectSheet();
+    const off=$('ssOff');off.onclick=()=>{if(!off.dataset.sure){off.dataset.sure=1;off.textContent='Tap again. Data on this device stays.';return}
+      try{localStorage.removeItem(SK)}catch(e){}cfg={};ckey=null;syncErr='';syncStatus();render();close();toast('Sync turned off on this device')};
+  })}
+function connectSheet(){
+  open(`<h3 id="shTitle">Turn on sync</h3>
+    <ol class="steps" style="font-size:14px;margin-top:0"><li>Sign in at <b>github.com</b> (a free account is fine).</li><li>Go to Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token.</li><li>Name it "Lengo", pick an expiry, and under <b>Account permissions</b> set <b>Gists</b> to <b>Read and write</b>. Leave everything else off. (A classic token with only the <b>gist</b> box ticked also works.)</li><li>Paste the token below. Use the same token and passphrase on your other device.</li></ol>
+    <form id="f" novalidate><label for="sTok">GitHub access token</label><input id="sTok" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(cfg.token||'')}" placeholder="github_pat_…">
+    <label for="sP1">Sync passphrase</label><input id="sP1" type="password" autocomplete="new-password" placeholder="At least 10 characters">
+    <label for="sP2">Repeat passphrase</label><input id="sP2" type="password" autocomplete="new-password">
+    <p class="hint">The passphrase never leaves your devices and can't be recovered. If you forget it, the online copy can't be opened, but the data on your devices stays.</p>
+    <div class="err" id="fErr"></div><button class="go" id="sGo">Connect</button></form>`,()=>{
+    $('f').onsubmit=async e=>{e.preventDefault();
+      const err=m=>{$('fErr').textContent=m},btn=$('sGo'),tok=$('sTok').value.trim(),p1=$('sP1').value,p2=$('sP2').value;
+      if(!(window.crypto&&crypto.subtle))return err("This browser can't encrypt here. Open the file in Chrome or Firefox.");
+      if(!tok)return err('Paste your GitHub access token.');if(p1.length<10)return err('Use a passphrase of at least 10 characters.');if(p1!==p2)return err("The passphrases don't match.");
+      const prevKey=ckey,prevCfg=cfg;btn.disabled=true;btn.textContent='Connecting…';err('');
+      try{
+        let found=null;
+        for(let pg=1;pg<=10&&!found;pg++){const list=await gh('/gists?per_page=100&page='+pg,{},tok);found=list.find(g=>g.files&&g.files[FN]);if(list.length<100)break}
+        let salt,id;
+        if(found){id=found.id;const env=await readGist(id,tok);salt=env.salt;const k=await derive(p1,salt);let remote;
+          try{remote=await dec(env,k)}catch(_){throw Object.assign(new Error('ckey'),{status:'ckey'})}
+          ckey=k;merge(remote)}
+        else{salt=b64(crypto.getRandomValues(new Uint8Array(16)));ckey=await derive(p1,salt);
+          const g=await gh('/gists',{method:'POST',body:JSON.stringify({description:'Lengo (encrypted)',public:false,files:{[FN]:{content:await enc(payload(),salt)}}})},tok);id=g.id}
+        cfg={token:tok,gistId:id,salt,ckey:b64(await crypto.subtle.exportKey('raw',ckey))};localStorage.setItem(SK,JSON.stringify(cfg));
+        syncErr='';store();render();close();toast(found?'Connected. Data from both devices merged.':'Sync is on');sync();
+      }catch(e2){ckey=prevKey;cfg=prevCfg;btn.disabled=false;btn.textContent='Connect';
+        err(e2.status==='ckey'?"That passphrase doesn't open your existing online copy. Use the one you set on your other device.":e2.status===401?'GitHub rejected that token. Check it and try again.':e2.status===403||e2.status===404?'That token can\'t use gists. Give it Gists: Read and write.':'Could not reach GitHub. Check your internet and try again.')}
+    }})}
+(async()=>{if(cfg.gistId&&cfg.ckey&&window.crypto&&crypto.subtle){try{ckey=await crypto.subtle.importKey('raw',ub64(cfg.ckey),'AES-GCM',true,['encrypt','decrypt']);sync()}catch(e){}}syncStatus()})();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync()});
+setInterval(()=>{if(document.visibilityState==='visible')sync()},120000);
+
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]'),g=e.target.closest('[data-go]'),tx=e.target.closest('.tx');
+  if(a){const k=a.dataset.act;({add:()=>depSheet(),rate:rateSheet,goal:goalSheet,copy:copyStatement,send:sendSheet,settings:settingsSheet,backup:backupSheet,sync:()=>syncSheet()})[k]?.()}
+  if(g){$(g.dataset.go).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('on',b===g))}
+  if(tx){const d=deps.find(x=>x.id===tx.dataset.id);if(d)depSheet(d)}
+});
+$('cUSD').onclick=()=>{cur='USD';save();render()};
+$('cKES').onclick=()=>{cur='KES';save();render()};
+$('eye').onclick=()=>{hidden=!hidden;save();render()};
+$('q').addEventListener('input',render);$('fs').addEventListener('change',render);
+document.addEventListener('keydown',e=>{
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName),open=sheet.classList.contains('open');
+  if(e.key==='Enter'&&document.activeElement.classList.contains('tx')){const d=deps.find(x=>x.id===document.activeElement.dataset.id);if(d)depSheet(d);return}
+  if(typing||open||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='n'||e.key==='N'){e.preventDefault();depSheet()}
+  if(e.key==='h'||e.key==='H'){hidden=!hidden;save();render()}
+});
+render();
+}
+</script>
+<script>if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
+</body>
+</html>
